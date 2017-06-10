@@ -109,3 +109,35 @@ Person = {
   ]
 }
 ```
+
+# Checking if somebody is in a room
+    MUSTARD IN DINING ROOM 4.0
+    ? IN DINING ROOM 4.0
+    MUSTARD ? DINING ROOM 4.0
+    MUSTARD IN ? 4.0
+    MUSTARD IN DINING ROOM ?
+
+### `checkIfInRoom(memory,who,what,where,when)`
+```python
+if who == '?':
+    peopleInRoom = []
+    lastEnter = {}
+    for i in range(len(memory)):
+        if memory[i]['what'] == 'ENTER':
+            lastEnter[memory[i]['who']] = i;
+        elif memory[i]['what'] == 'LEAVE':
+            if lastEnter[memory[i]['who']] is not None:
+                if memory[lastEnter[memory[i]['who']]]['when'] <= float(when) and memory[i]['when'] > float(when):
+                    peopleInRoom.append(memory[i]['who'])
+                    lastEnter[memory[i]['who']] = None
+        elif i >= len(times) - 1:
+                for key, value in lastEnter.iteritems():
+                    if memory[value]['when'] <= float(when):
+                        peopleInRoom.append(key)
+elif what == '?':
+    pass
+elif where == '?':
+    pass
+elif when == '?':
+    pass
+```
