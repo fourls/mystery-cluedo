@@ -71,7 +71,7 @@ while 1:
             for personSprite in peopleGroup:
                 if personSprite.rect.collidepoint((mx,my)):
                     for match in fw.askPerson(personSprite.person.name,raw_input('who: '),raw_input('what: '),raw_input('where: '),raw_input('when: ')):
-                        print(person.name + ' says they saw ' + match['who'] + ' ' + match['what'] + ' the ' + match['where'] + ' at ' + str(match['when']))
+                        print(personSprite.person.name + ' says they saw ' + match['who'] + ' ' + match['what'] + ' the ' + match['where'] + ' at ' + str(match['when']))
 
     screen.fill((0,0,0))
     roomGroup.draw(screen)
