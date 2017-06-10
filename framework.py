@@ -69,10 +69,10 @@ rooms = [
 
 people = [
     Person('MUSTARD',0),
-    Person('CYAN',0),
+    Person('BLUE',0),
     Person('SCARLET',0),
-    Person('BLACK',0),
-    Person('WHITE',0)
+    Person('NAVY',0),
+    Person('GREEN',0)
 ]
 
 def initialise(time=1.5):
