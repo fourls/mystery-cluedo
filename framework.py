@@ -102,30 +102,41 @@ def whatPersonDoes(person):
     else:
         return 'NOTHING'
 
-def checkIfPersonInRoom(asker,person,time,room):
-    times = []
+def checkWhoInRoom(memory,where,when):
+    peopleInRoom = []
 
-    for mem in asker.memory:
-        if mem['who'] == person and mem['where'] == room:
-            if mem['what'] == 'ENTER' or mem['what'] == 'IN':
-                times.append({'what':'ENTER','when':mem['when']})
-            if mem['what'] == 'LEAVE':
-                times.append({'what':'LEAVE','when':mem['when']})
-        if mem['who'] == asker.name and mem['where'] == room and mem['what'] == 'LEAVE':
-            times.append({'what':'LEAVE','when':mem['when']})
+    for i in range(len(memory)):
+        if memory[i]['where'] == where:
+            if memory[i]['what'] == 'ENTER' or memory[i]['what'] == 'IN':
+                if memory[i]['when'] <= when:
+                    peopleInRoom.append(memory[i]['who'])
+            elif memory[i]['what'] == 'LEAVE':
+                if memory[i]['when'] <= when:
+                    peopleInRoom.remove(memory[i]['who'])
     
-    lastEnter = -1
-    for i in range(len(times)):
-        if times[i]['what'] == 'ENTER':
-            lastEnter = i;
-        elif times[i]['what'] == 'LEAVE':
-            if lastEnter is not -1:
-                if times[lastEnter]['when'] <= float(time) and times[i]['when'] > float(time):
-                    return True
-        elif i >= len(times) - 1:
-            if times[lastEnter]['when'] <= float(time):
-                return True
-    return False
+    return peopleInRoom
+
+def checkWhenInRoom(memory,who,where):
+    placesSeen = []
+
+    for i in range(len(memory)):
+        if memory[i]['where'] == where and memory[i]['who'] == who:
+            if memory[i]['what'] == 'ENTER' or memory[i]['what'] == 'IN':
+                placesSeen.append({'START':memory[i]['when'],'END':10.0})
+            elif memory[i]['what'] == 'LEAVE':
+                placesSeen[len(placesSeen)-1]['END'] = memory[i]['when']
+    
+
+    return placesSeen
+
+def checkWhereSeen(memory,who,when):
+    placesSeen = []
+
+    for i in range(len(memory)):
+        if memory[i]['when'] == when and memory[i]['who'] == who:
+            placesSeen += memory[i]['where']
+
+    return placesSeen
 
 def getMatching(per,who,what,when,where):
     matchList = []
@@ -169,12 +180,6 @@ def getMatching(per,who,what,when,where):
     return matchList
 
 def askPerson(personInput, whoInput, whatInput, whereInput, whenInput):
-    #personInput = raw_input('Talking to: ')
-    #whoInput = raw_input('Who: ')
-    #whatInput = raw_input('What: ')
-    #whereInput = raw_input('Where: ')
-    #whenInput = raw_input('When: ')
-
     matchList = []
 
     for person in people:
@@ -183,8 +188,6 @@ def askPerson(personInput, whoInput, whatInput, whereInput, whenInput):
             if len(matching) == 0:
                 print(person.name + " says they don't know.")
             else:
-                for match in matching:
-                    print(person.name + ' says they saw ' + match['who'] + ' ' + match['what'] + ' the ' + match['where'] + ' at ' + str(match['when']))
                 matchList += matching
 
     return matchList
@@ -193,7 +196,7 @@ if __name__ == '__main__':
     initialise()
 
     for person in people:
-        #print(person.name)
+    #    #print(person.name)
 
         for mem in person.memory:
             print(person.name + " saw " + str(mem["who"]) + " " + str(mem["what"]) + " the " + str(mem["where"]) + " at " + str(mem["when"]))
@@ -209,7 +212,11 @@ if __name__ == '__main__':
     #    print("\n")
 
     while True:
-        pass
+        #for per in checkWhoInRoom(people[int(raw_input('Asking #: '))].memory,raw_input('Where: '),raw_input('When: ')):
+        #    print(per)
+        for per in checkWhenInRoom(people[int(raw_input('Asking #: '))].memory,raw_input('Who: '),raw_input('Where: ')):
+            print(per)
+        #pass
         #askPerson()
         #print("\n")
         #personIndex = int(raw_input('Asking #: '))
