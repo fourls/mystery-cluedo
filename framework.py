@@ -182,29 +182,30 @@ def askPerson():
                     print(person.name + ' says they saw ' + match['who'] + ' ' + match['what'] + ' the ' + match['where'] + ' at ' + str(match['when']))
 
 #--------- main run --------#
-initialise()
+if __name__ == '__main__':
+    initialise()
 
-for person in people:
-    #print(person.name)
+    for person in people:
+        #print(person.name)
 
-    for mem in person.memory:
-        print(person.name + " saw " + str(mem["who"]) + " " + str(mem["what"]) + " the " + str(mem["where"]) + " at " + str(mem["when"]))
-    
-    print("\n")
+        for mem in person.memory:
+            print(person.name + " saw " + str(mem["who"]) + " " + str(mem["what"]) + " the " + str(mem["where"]) + " at " + str(mem["when"]))
+        
+        print("\n")
 
-#for room in rooms:
-#    #print(room.name)
-#
-#    for his in room.history:
-#        print(room.name + " saw " + his["who"] + " " + his["what"] + " the " + his["where"] + " at " + str(his["when"]))
-#
-#    print("\n")
+    #for room in rooms:
+    #    #print(room.name)
+    #
+    #    for his in room.history:
+    #        print(room.name + " saw " + his["who"] + " " + his["what"] + " the " + his["where"] + " at " + str(his["when"]))
+    #
+    #    print("\n")
 
-while True:
-    askPerson()
-    print("\n")
-    #personIndex = int(raw_input('Asking #: '))
-    #if(checkIfPersonInRoom(people[personIndex],raw_input('Person: '),raw_input('Time: '),raw_input('Room: '))):
-    #    print('They were there then.')
-    #else:
-    #    print('They weren\'t there then.')
+    while True:
+        askPerson()
+        print("\n")
+        #personIndex = int(raw_input('Asking #: '))
+        #if(checkIfPersonInRoom(people[personIndex],raw_input('Person: '),raw_input('Time: '),raw_input('Room: '))):
+        #    print('They were there then.')
+        #else:
+        #    print('They weren\'t there then.')
