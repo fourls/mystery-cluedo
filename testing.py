@@ -1,3 +1,4 @@
+import unittest
 from framework import *
 
 game = Game(
@@ -27,6 +28,6 @@ while True:
         raw_input('Who: '),
         raw_input('What: '),
         raw_input('Where: '),
-        raw_input('When: ')
+        float(raw_input('When: '))
     ):
-        print(match['who'] + ' ' + match['what'] + ' the ' + match['where'] + ' at ' + str(match['when']))
+        print(match)

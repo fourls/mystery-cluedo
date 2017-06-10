@@ -79,6 +79,8 @@ class Game ():
             time += 0.5
         for person in self.people: 
             person = self.givePersonHistoryOfRoom(person,person.room)
+        
+        return True
 
     def personAt(self,person,room):
         return person.room == room
@@ -116,14 +118,30 @@ class Game ():
         return person
 
     def askPerson(self, personInput, whoInput, whatInput, whereInput, whenInput):
-        matchList = []
+        person = None
+        for p in self.people:
+            if p.name == personInput:
+                person = p
+        
+        if person == None:
+            return ['This person does not exist.']
+        
+        if whatInput == 'IN':
+            if whoInput == '?':
+                return checkWhoInRoom(person.memory,whereInput,whenInput)
+            elif whenInput == '?':
+                return checkWhenInRoom(person.memory,whoInput,whereInput)
+            elif whereInput == '?':
+                return checkWhereSeen(person.memory,whoInput,whenInput)
+        else:
+            matchList = []
 
-        for person in self.people:
-            if person.name == personInput:
-                matching = getMatching(person,whoInput,whatInput,whenInput,whereInput)
-                matchList += matching
+            for person in self.people:
+                if person.name == personInput:
+                    matching = getMatching(person,whoInput,whatInput,whenInput,whereInput)
+                    matchList += matching
 
-        return matchList
+            return matchList
 
 def whatPersonDoes():
     percent = random.random()
@@ -169,21 +187,12 @@ def checkWhereSeen(memory,who,when):
 
     for i in range(len(memory)):
         if memory[i]['when'] == when and memory[i]['who'] == who:
-            placesSeen += memory[i]['where']
+            placesSeen.append(memory[i]['where'])
 
     return placesSeen
 
 def getMatching(per,who,what,when,where):
     matchList = []
-
-    
-    if what == 'IN':
-        if who == '?':
-            checkWhoInRoom(per.memory,where,when)
-        elif when == '?':
-            checkWhenInRoom(per.memory,who,where)
-        elif where == '?':
-            checkWhereSeen(per.memory,who,when)
     
 
     lis = per.memory
