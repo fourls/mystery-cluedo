@@ -17,12 +17,13 @@ class Room ():
         self.history.append({'who':name,'what':action,'when':time,'where':self.name})
 
 class Person ():
-    def __init__(self, name, room):
+    def __init__(self, name):
         self.name = name
         self.memory = []
+        self.room = -1
         self.timeEnteredRoom = 1.0
-        self.enter(1.0,room)
     
+    '''
     def leave(self,time):
         rooms[self.room].event(self.name,'LEAVE',time)
         self.getHistoryOfRoom()
@@ -54,46 +55,77 @@ class Person ():
             if event['when'] >= self.timeEnteredRoom:
                 historyWhileInRoom.append(event)
         self.memory += historyWhileInRoom
-        
-    #def sees(self,name,action,time,place):
-    #    self.memory.append({'who':name,'what':action,'when':time,'where':place})
+    '''
 
-rooms = [
-    Room('DINING ROOM'),
-    Room('OBSERVATORY'),
-    Room('KITCHEN'),
-    Room('BEDROOM'),
-    Room('LIVING ROOM'),
-    Room('BASEMENT'),
-    Room('CLASSROOM'),
-    Room('HALLWAY'),
-    Room('SWIMMING POOL')
-]
 
-people = [
-    Person('MUSTARD',random.randint(0,len(rooms) -1)),
-    Person('BLUE',random.randint(0,len(rooms) -1)),
-    Person('SCARLET',random.randint(0,len(rooms) -1)),
-    Person('NAVY',random.randint(0,len(rooms) -1)),
-    Person('GREEN',random.randint(0,len(rooms) -1))
-]
+class Game ():
+    def __init__(self, r, p):
+        self.rooms = r
+        self.people = p
+        for p in self.people:
+            self.personEnter(p,1.0,random.randint(0,len(self.rooms)-1))
+        self.initialise()
+    
+    def initialise(self,time=1.5):
+        while time <= 10.0:
+            for person in self.people:
+                action = whatPersonDoes()
+                if action == 'LEAVE':
+                    newroom = random.randint(0,len(self.rooms) - 1)
+                    if not self.personAt(person,newroom):
+                        person = self.personLeave(person,time)
+                        person = self.personEnter(person,time,newroom)
 
-def initialise(time=1.5):
-    while time <= 10.0:
-        for person in people:
-            action = whatPersonDoes(person)
-            if action == 'LEAVE':
-                newroom = random.randint(0,len(rooms) - 1)
-                if not person.at(newroom):
-                    person.leave(time)
-                    person.enter(time,newroom)
+            time += 0.5
+        for person in self.people: 
+            person = self.givePersonHistoryOfRoom(person,person.room)
 
-        time += 0.5
-        #print(time)
-    for person in people: 
-        person.getHistoryOfRoom()
+    def personAt(self,person,room):
+        return person.room == room
 
-def whatPersonDoes(person):
+    def personEnter(self,person,time,room):
+        person.room = room
+        self.rooms[room].event(person.name,'ENTER',time)
+        for per in self.rooms[room].people:
+            if per['name'] != person.name: 
+                timeOfEvent = time
+                if per['time'] != time:
+                    person.memory.append({'who':per['name'],'what':'IN','when':timeOfEvent,'where':self.rooms[room].name})
+                else:
+                    for mem in person.memory:
+                        if not (mem['who'] == per['name'] and mem['when'] == timeOfEvent):
+                            person.memory.append({'who':per['name'],'what':'ENTER','when':timeOfEvent,'where':self.rooms[room].name})
+                    
+        person.timeEnteredRoom = time
+        return person
+    
+    def personLeave(self,person,time):
+        self.rooms[person.room].event(person.name,'LEAVE',time)
+        self.givePersonHistoryOfRoom(person,person.room)
+        person.room = None
+        return person
+
+    def givePersonHistoryOfRoom(self,person,room):
+        historyWhileInRoom = []
+
+        for event in self.rooms[room].history:
+            if event['when'] >= person.timeEnteredRoom:
+                historyWhileInRoom.append(event)
+        person.memory += historyWhileInRoom
+
+        return person
+
+    def askPerson(self, personInput, whoInput, whatInput, whereInput, whenInput):
+        matchList = []
+
+        for person in self.people:
+            if person.name == personInput:
+                matching = getMatching(person,whoInput,whatInput,whenInput,whereInput)
+                matchList += matching
+
+        return matchList
+
+def whatPersonDoes():
     percent = random.random()
     if percent <= 0.2:
         return 'LEAVE'
@@ -102,6 +134,7 @@ def whatPersonDoes(person):
     else:
         return 'NOTHING'
 
+# ____ in PLACE at TIME
 def checkWhoInRoom(memory,where,when):
     peopleInRoom = []
 
@@ -116,6 +149,7 @@ def checkWhoInRoom(memory,where,when):
     
     return peopleInRoom
 
+# NAME in PLACE at _____
 def checkWhenInRoom(memory,who,where):
     placesSeen = []
 
@@ -129,6 +163,7 @@ def checkWhenInRoom(memory,who,where):
 
     return placesSeen
 
+# NAME in _______ at TIME
 def checkWhereSeen(memory,who,when):
     placesSeen = []
 
@@ -141,14 +176,15 @@ def checkWhereSeen(memory,who,when):
 def getMatching(per,who,what,when,where):
     matchList = []
 
-    '''
+    
     if what == 'IN':
-        if when == '?':
-            matchList = getMatching(per,who,'ENTER',when,where) + getMatching(per,who,'LEAVE',when,where)
-        else: 
-            if checkIfPersonInRoom(per,who,when,where):
-                matchList.append({'who':who,'what':'IN','when':when,'where':where})
-    '''
+        if who == '?':
+            checkWhoInRoom(per.memory,where,when)
+        elif when == '?':
+            checkWhenInRoom(per.memory,who,where)
+        elif where == '?':
+            checkWhereSeen(per.memory,who,when)
+    
 
     lis = per.memory
     for item in lis:
@@ -168,63 +204,5 @@ def getMatching(per,who,what,when,where):
         
         if Ywho and Ywhat and Ywhen and Ywhere:
             matchList.append(item)
-    
-    '''
-    if what == '?':
-        if checkIfPersonInRoom(per,who,when,where):
-            skip = False
-            for match in matchList:
-                if (match['who'] == who and str(match['when']) == str(when)):
-                    skip = True
-            
-            if not skip:
-                matchList.append({'who':who,'what':'IN','when':float(when),'where':where})
-    '''
 
     return matchList
-
-def askPerson(personInput, whoInput, whatInput, whereInput, whenInput):
-    matchList = []
-
-    for person in people:
-        if person.name == personInput:
-            matching = getMatching(person,whoInput,whatInput,whenInput,whereInput)
-            if len(matching) == 0:
-                print(person.name + " says they don't know.")
-            else:
-                matchList += matching
-
-    return matchList
-#--------- main run --------#
-if __name__ == '__main__':
-    initialise()
-
-    for person in people:
-    #    #print(person.name)
-
-        for mem in person.memory:
-            print(person.name + " saw " + str(mem["who"]) + " " + str(mem["what"]) + " the " + str(mem["where"]) + " at " + str(mem["when"]))
-        
-        print("\n")
-
-    #for room in rooms:
-    #    #print(room.name)
-    #
-    #    for his in room.history:
-    #        print(room.name + " saw " + his["who"] + " " + his["what"] + " the " + his["where"] + " at " + str(his["when"]))
-    #
-    #    print("\n")
-
-    while True:
-        #for per in checkWhoInRoom(people[int(raw_input('Asking #: '))].memory,raw_input('Where: '),raw_input('When: ')):
-        #    print(per)
-        for per in checkWhenInRoom(people[int(raw_input('Asking #: '))].memory,raw_input('Who: '),raw_input('Where: ')):
-            print(per)
-        #pass
-        #askPerson()
-        #print("\n")
-        #personIndex = int(raw_input('Asking #: '))
-        #if(checkIfPersonInRoom(people[personIndex],raw_input('Person: '),raw_input('Time: '),raw_input('Room: '))):
-        #    print('They were there then.')
-        #else:
-        #    print('They weren\'t there then.')
