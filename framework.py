@@ -168,12 +168,14 @@ def getMatching(per,who,what,when,where):
     
     return matchList
 
-def askPerson():
-    personInput = raw_input('Talking to: ')
-    whoInput = raw_input('Who: ')
-    whatInput = raw_input('What: ')
-    whereInput = raw_input('Where: ')
-    whenInput = raw_input('When: ')
+def askPerson(personInput, whoInput, whatInput, whereInput, whenInput):
+    #personInput = raw_input('Talking to: ')
+    #whoInput = raw_input('Who: ')
+    #whatInput = raw_input('What: ')
+    #whereInput = raw_input('Where: ')
+    #whenInput = raw_input('When: ')
+
+    matchList = []
 
     for person in people:
         if person.name == personInput:
@@ -183,7 +185,9 @@ def askPerson():
             else:
                 for match in matching:
                     print(person.name + ' says they saw ' + match['who'] + ' ' + match['what'] + ' the ' + match['where'] + ' at ' + str(match['when']))
+                matchList += matching
 
+    return matchList
 #--------- main run --------#
 if __name__ == '__main__':
     initialise()
@@ -205,8 +209,9 @@ if __name__ == '__main__':
     #    print("\n")
 
     while True:
-        askPerson()
-        print("\n")
+        pass
+        #askPerson()
+        #print("\n")
         #personIndex = int(raw_input('Asking #: '))
         #if(checkIfPersonInRoom(people[personIndex],raw_input('Person: '),raw_input('Time: '),raw_input('Room: '))):
         #    print('They were there then.')
