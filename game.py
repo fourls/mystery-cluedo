@@ -66,6 +66,11 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             sys.exit()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            mx, my = pygame.mouse.get_pos()
+            for personSprite in peopleGroup:
+                if personSprite.rect.collidepoint((mx,my)):
+                    fw.askPerson()
 
     screen.fill((0,0,0))
     roomGroup.draw(screen)
