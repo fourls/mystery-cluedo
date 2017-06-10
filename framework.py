@@ -54,7 +54,7 @@ class Person ():
             if event['when'] >= self.timeEnteredRoom:
                 historyWhileInRoom.append(event)
         self.memory += historyWhileInRoom
-
+        
     #def sees(self,name,action,time,place):
     #    self.memory.append({'who':name,'what':action,'when':time,'where':place})
 
@@ -141,12 +141,14 @@ def checkWhereSeen(memory,who,when):
 def getMatching(per,who,what,when,where):
     matchList = []
 
+    '''
     if what == 'IN':
         if when == '?':
             matchList = getMatching(per,who,'ENTER',when,where) + getMatching(per,who,'LEAVE',when,where)
         else: 
             if checkIfPersonInRoom(per,who,when,where):
                 matchList.append({'who':who,'what':'IN','when':when,'where':where})
+    '''
 
     lis = per.memory
     for item in lis:
@@ -167,6 +169,7 @@ def getMatching(per,who,what,when,where):
         if Ywho and Ywhat and Ywhen and Ywhere:
             matchList.append(item)
     
+    '''
     if what == '?':
         if checkIfPersonInRoom(per,who,when,where):
             skip = False
@@ -176,7 +179,8 @@ def getMatching(per,who,what,when,where):
             
             if not skip:
                 matchList.append({'who':who,'what':'IN','when':float(when),'where':where})
-    
+    '''
+
     return matchList
 
 def askPerson(personInput, whoInput, whatInput, whereInput, whenInput):
