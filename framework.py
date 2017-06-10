@@ -64,15 +64,18 @@ rooms = [
     Room('KITCHEN'),
     Room('BEDROOM'),
     Room('LIVING ROOM'),
-    Room('BASEMENT')
+    Room('BASEMENT'),
+    Room('CLASSROOM'),
+    Room('HALLWAY'),
+    Room('SWIMMING POOL')
 ]
 
 people = [
-    Person('MUSTARD',0),
-    Person('BLUE',0),
-    Person('SCARLET',0),
-    Person('NAVY',0),
-    Person('GREEN',0)
+    Person('MUSTARD',random.randint(0,len(rooms) -1)),
+    Person('BLUE',random.randint(0,len(rooms) -1)),
+    Person('SCARLET',random.randint(0,len(rooms) -1)),
+    Person('NAVY',random.randint(0,len(rooms) -1)),
+    Person('GREEN',random.randint(0,len(rooms) -1))
 ]
 
 def initialise(time=1.5):
