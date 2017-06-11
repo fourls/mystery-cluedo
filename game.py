@@ -4,8 +4,8 @@ pygame.init()
 
 SIZE = WIDTH, HEIGHT = 400, 440
 FPS = 40
-ROOM_FONT = pygame.font.SysFont("Arial", 10)
-UI_FONT = pygame.font.SysFont('Arial',15)
+ROOM_FONT = pygame.font.SysFont("Avenir", 11)
+UI_FONT = pygame.font.SysFont('Avenir',15)
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('MYSTERY CLUEDO')
@@ -196,7 +196,10 @@ choiceGroup.add(timeChoiceButton)
 talkingToText = UIText(0,200,WIDTH,40,'')
 uiGroup.add(talkingToText)
 
+selectedPerson = None
+
 def onEnterButtonClicked(self):
+    global selectedPerson
     asking = selectedPerson
     who = personChoiceButton.options[personChoiceButton.index]
     what = actionChoiceButton.options[actionChoiceButton.index]
@@ -205,11 +208,13 @@ def onEnterButtonClicked(self):
 
     for match in fw.askPerson(asking.memory,asking.name,who,what,where,when):
         print(match)
+    
+    selectedPerson = None
+    talkingToText.updateText('')
 
 enterButton = Button(0,400,WIDTH,40,'Ask',onEnterButtonClicked)
 uiGroup.add(enterButton)
 
-selectedPerson = None
 while 1:
     choiceGroup.update()
     uiGroup.update()
@@ -235,6 +240,7 @@ while 1:
     screen.fill((255,255,255))
     roomGroup.draw(screen)
     peopleGroup.draw(screen)
-    choiceGroup.draw(screen)
+    if(selectedPerson is not None):
+        choiceGroup.draw(screen)
     uiGroup.draw(screen)
     pygame.display.flip()
