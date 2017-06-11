@@ -8,7 +8,7 @@ ROOM_FONT = pygame.font.SysFont("Avenir", 11)
 UI_FONT = pygame.font.SysFont('Avenir',15)
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SIZE)
-pygame.display.set_caption('MYSTERY CLUEDO')
+pygame.display.set_caption('Mystery Cluedo')
 
 class Person(pygame.sprite.Sprite):
     def __init__(self, person, x, y):
@@ -38,6 +38,7 @@ class UIText(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.text = text
+        # pylint: disable=E1121
         self.image = pygame.Surface((width,height))
         self.rect = self.image.get_rect(x=x,y=y)
 
@@ -65,6 +66,7 @@ class Button(pygame.sprite.Sprite):
     def __init__(self,x,y,width,height,text,clicked):
         pygame.sprite.Sprite.__init__(self)
 
+        # pylint: disable=E1121
         self.image = pygame.Surface((width,height))
         self.rect = self.image.get_rect(x=x,y=y)
 
@@ -98,6 +100,7 @@ class ActionToggle(pygame.sprite.Sprite):
         self.options = options
         self.index = 0
 
+        # pylint: disable=E1121
         self.image = pygame.Surface((width,height))
         self.rect = self.image.get_rect(x=x,y=y)
 
@@ -183,8 +186,8 @@ for person in game.people:
     for roomSprite in roomGroup:
         for p2 in roomSprite.room.people:
             if p2['name'] == person.name:
-                px = roomSprite.rect.x + ((roomSprite.room.people.index(p2)) * 20)
-                py = roomSprite.rect.y + 20 + ((roomSprite.room.people.index(p2)) * 20)
+                px = random.randrange(roomSprite.rect.x,roomSprite.rect.x + roomSprite.rect.width - 20)
+                py = random.randrange(roomSprite.rect.y,roomSprite.rect.y + roomSprite.rect.height - 20)
     
     personSprite = Person(person, px, py)
     peopleGroup.add(personSprite)
