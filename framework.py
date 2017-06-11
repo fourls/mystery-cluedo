@@ -21,41 +21,6 @@ class Person ():
         self.memory = []
         self.room = -1
         self.timeEnteredRoom = 1.0
-    
-    '''
-    def leave(self,time):
-        rooms[self.room].event(self.name,'LEAVE',time)
-        self.getHistoryOfRoom()
-        self.room = None
-
-    def enter(self,time,room):
-        self.room = room
-        rooms[self.room].event(self.name,'ENTER',time)
-        for per in rooms[self.room].people:
-            if per['name'] != self.name: 
-                timeOfEvent = time
-                if per['time'] != time:
-                    self.memory.append({'who':per['name'],'what':'IN','when':timeOfEvent,'where':rooms[self.room].name})
-                else:
-                    for mem in self.memory:
-                        if not (mem['who'] == per['name'] and mem['when'] == timeOfEvent):
-                            self.memory.append({'who':per['name'],'what':'ENTER','when':timeOfEvent,'where':rooms[self.room].name})
-                    
-
-        self.timeEnteredRoom = time
-    
-    def at(self,room):
-        return self.room == room
-    
-    def getHistoryOfRoom(self):
-
-        historyWhileInRoom = []
-        for event in rooms[self.room].history:
-            if event['when'] >= self.timeEnteredRoom:
-                historyWhileInRoom.append(event)
-        self.memory += historyWhileInRoom
-    '''
-
 
 class Game ():
     def __init__(self, r, p):
@@ -123,12 +88,12 @@ def askPerson(memoryInput, askingInput, whoInput, whatInput, whereInput, whenInp
 
     if whatInput == 'IN':
         if whoInput == '?':
-            return checkWhoInRoom(memoryInput,askingInput,whereInput,whenInput)
+            return createReturnDict(checkWhoInRoom(memoryInput,askingInput,whereInput,whenInput),'checkWhoInRoom')
         elif whenInput == '?':
-            return checkWhenInRoom(memoryInput,askingInput,whoInput,whereInput)
+            return createReturnDict(checkWhenInRoom(memoryInput,askingInput,whoInput,whereInput),'checkWhenInRoom')
         elif whereInput == '?':
-            return checkWhereSeen(memoryInput,askingInput,whoInput,whenInput)
-        return []
+            return createReturnDict(checkWhereSeen(memoryInput,askingInput,whoInput,whenInput), 'checkWhereSeen')
+        return {'type':'emptyIn','result':[]}
     else:
         matchList = []
 
@@ -140,7 +105,11 @@ def askPerson(memoryInput, askingInput, whoInput, whatInput, whereInput, whenInp
                 matchList.append({'who':whoInput,'what':'IN','where':whereInput,'when':whenInput})
             
 
-        return matchList
+        return createReturnDict(matchList,'matched')
+
+def createReturnDict(result,context):
+    retval = {'type':context,'result':result}
+    return retval
 
 def whatPersonDoes():
     percent = random.random()
