@@ -211,9 +211,9 @@ choiceDialogGroup.add(timeChoiceButton)
 
 talkingToText = UIText(0,200,WIDTH,40,'')
 choiceDialogGroup.add(talkingToText)
-tipText = UIText(0,200,WIDTH,200,'Click on somebody to interact with them.')
+tipText = UIText(0,200,WIDTH,240,'Click on somebody to interact with them.')
 defaultDialogGroup.add(tipText)
-resultText = UIText(0,200,WIDTH,200,'You shouldn\'t see this.')
+resultText = UIText(0,200,WIDTH,240,'You shouldn\'t see this.')
 resultDialogGroup.add(resultText)
 
 selectedPerson = None
@@ -227,13 +227,12 @@ def onEnterButtonClicked(self):
     where = placeChoiceButton.options[placeChoiceButton.index]
     when = timeChoiceButton.options[timeChoiceButton.index]
 
-    matches = selectedPerson.name + ' says:\n '
-    for match in fw.askPerson(asking.memory,asking.name,who,what,where,when):
-        matches += json.dumps(match) + '\n'
+    result = fw.askPerson(asking.memory,asking.name,who,what,where,when)
+
     
     selectedPerson = None
     talkingToText.updateText('You shouldn\'t see this.')
-    resultText.updateText(matches)
+    resultText.updateText(fw.handleResult(result,asking.name,who,what,where,when))
     dialogShown = 'RESULT'
 
 enterButton = Button(0,400,WIDTH,40,'Ask',onEnterButtonClicked)
@@ -259,6 +258,9 @@ while 1:
                         choiceSprite.clicked()
                 if enterButton.rect.collidepoint((mx,my)):
                     enterButton.clicked(enterButton)
+            elif dialogShown == 'RESULT':
+                if resultText.rect.collidepoint((mx,my)):
+                    dialogShown = 'DEFAULT'
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE and dialogShown == 'RESULT':
                 dialogShown = 'DEFAULT'
