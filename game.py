@@ -1,5 +1,6 @@
 import sys, pygame, random, json
 import framework as fw
+import textwrapping as tw
 pygame.init()
 
 SIZE = WIDTH, HEIGHT = 400, 440
@@ -38,6 +39,7 @@ class UIText(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.text = text
+        self.textWrapped = tw.wrapline(text,UI_FONT,width - 20)
         # pylint: disable=E1121
         self.image = pygame.Surface((width,height))
         self.rect = self.image.get_rect(x=x,y=y)
@@ -45,15 +47,20 @@ class UIText(pygame.sprite.Sprite):
         self.buildText()
 
     def buildText(self):
-        self.textSurf = UI_FONT.render(self.text,1,(0,0,0))
-        self.textRect = self.textSurf.get_rect()
-        self.textRect.center = [self.rect.width/2,self.rect.height/2]
-
         self.image.fill((255,255,255))
-        self.image.blit(self.textSurf,self.textRect)
+        for para in range(len(self.textWrapped)): #   0    1      #  len = 2
+            thisText = UI_FONT.render(self.textWrapped[para],1,(0,0,0))
+            thisRect = thisText.get_rect()
+            if len(self.textWrapped) == 1:
+                thisRect.center = [self.rect.width/2,self.rect.height/2 + (para * 20)]
+            else:
+                thisRect.center = [self.rect.width/2,self.rect.height/2 - (float(len(self.textWrapped))/2 * 10) + (para * 20)]
+            self.image.blit(thisText,thisRect)
+
 
     def updateText(self,text):
         self.text = text
+        self.textWrapped = tw.wrapline(text,UI_FONT,self.rect.width - 20)
         self.buildText()
     
     def hideText(self):
