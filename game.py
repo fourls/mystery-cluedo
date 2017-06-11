@@ -1,11 +1,11 @@
-import sys, pygame, random
+import sys, pygame, random, json
 import framework as fw
 pygame.init()
 
 SIZE = WIDTH, HEIGHT = 400, 440
 FPS = 40
-ROOM_FONT = pygame.font.SysFont("Avenir", 11)
-UI_FONT = pygame.font.SysFont('Avenir',15)
+ROOM_FONT = pygame.font.SysFont('Tahoma', 11)
+UI_FONT = pygame.font.SysFont('Tahoma',15)
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Mystery Cluedo')
@@ -95,6 +95,8 @@ class Button(pygame.sprite.Sprite):
 
 
 class ActionToggle(pygame.sprite.Sprite):
+    canShowQuestionMark = True
+
     def __init__(self,x,y,width,height,options):
         pygame.sprite.Sprite.__init__(self)
         self.options = options
@@ -125,12 +127,14 @@ class ActionToggle(pygame.sprite.Sprite):
         self.image.blit(self.textSurf,self.textRect)
     
     def clicked(self):
-        if self.index + 1 < len(self.options):
+        if self.options[self.index] == '?':
+            ActionToggle.canShowQuestionMark = True
+        elif self.index + 1 < len(self.options):
             if self.options[self.index + 1] == '?':
-                for group in self.groups():
-                    for sprite in group:
-                        if sprite.options[sprite.index] == '?':
-                            self.index += 1
+                if ActionToggle.canShowQuestionMark:
+                    ActionToggle.canShowQuestionMark = False
+                else:
+                    self.index += 1
 
         
         self.index += 1
@@ -142,9 +146,11 @@ class ActionToggle(pygame.sprite.Sprite):
 
 peopleGroup = pygame.sprite.Group()
 roomGroup = pygame.sprite.Group()
-choiceGroup = pygame.sprite.Group()
-buttonGroup = pygame.sprite.Group()
 uiGroup = pygame.sprite.Group()
+
+defaultDialogGroup = pygame.sprite.Group()
+choiceDialogGroup = pygame.sprite.Group()
+resultDialogGroup = pygame.sprite.Group()
 
 personInputList = []
 roomInputList = []
@@ -195,42 +201,46 @@ for person in game.people:
     personInputList.append(person.name)
 
 personChoiceButton = ActionToggle(0,240,WIDTH,40,personInputList + ['?'])
-choiceGroup.add(personChoiceButton)
+choiceDialogGroup.add(personChoiceButton)
 actionChoiceButton = ActionToggle(0,280,WIDTH,40,['ENTER','IN','LEAVE'] + ['?'])
-choiceGroup.add(actionChoiceButton)
+choiceDialogGroup.add(actionChoiceButton)
 placeChoiceButton = ActionToggle(0,320,WIDTH,40,roomInputList + ['?'])
-choiceGroup.add(placeChoiceButton)
+choiceDialogGroup.add(placeChoiceButton)
 timeChoiceButton = ActionToggle(0,360,WIDTH,40,[str(x * 0.5) for x in range(2, 21)] + ['?'])
-choiceGroup.add(timeChoiceButton)
+choiceDialogGroup.add(timeChoiceButton)
 
 talkingToText = UIText(0,200,WIDTH,40,'')
-uiGroup.add(talkingToText)
+choiceDialogGroup.add(talkingToText)
 tipText = UIText(0,200,WIDTH,200,'Click on somebody to interact with them.')
-uiGroup.add(tipText)
+defaultDialogGroup.add(tipText)
+resultText = UIText(0,200,WIDTH,200,'You shouldn\'t see this.')
+resultDialogGroup.add(resultText)
 
 selectedPerson = None
+dialogShown = 'DEFAULT'
 
 def onEnterButtonClicked(self):
-    global selectedPerson
+    global selectedPerson, dialogShown
     asking = selectedPerson
     who = personChoiceButton.options[personChoiceButton.index]
     what = actionChoiceButton.options[actionChoiceButton.index]
     where = placeChoiceButton.options[placeChoiceButton.index]
     when = timeChoiceButton.options[timeChoiceButton.index]
 
+    matches = selectedPerson.name + ' says:\n '
     for match in fw.askPerson(asking.memory,asking.name,who,what,where,when):
-        print(match)
+        matches += json.dumps(match) + '\n'
     
     selectedPerson = None
     talkingToText.updateText('You shouldn\'t see this.')
-    talkingToText.hideText()
-    tipText.showText()
+    resultText.updateText(matches)
+    dialogShown = 'RESULT'
 
 enterButton = Button(0,400,WIDTH,40,'Ask',onEnterButtonClicked)
-buttonGroup.add(enterButton)
+choiceDialogGroup.add(enterButton)
 
 while 1:
-    choiceGroup.update()
+    choiceDialogGroup.update()
     uiGroup.update()
 
     for event in pygame.event.get():
@@ -241,23 +251,28 @@ while 1:
             for personSprite in peopleGroup:
                 if personSprite.rect.collidepoint((mx,my)):
                     talkingToText.updateText('You are talking to ' + personSprite.person.name)
-                    talkingToText.showText()
-                    tipText.hideText()
+                    dialogShown = 'CHOICE'
                     selectedPerson = personSprite.person
-            for choiceSprite in choiceGroup:
-                if choiceSprite.rect.collidepoint((mx,my)):
-                    choiceSprite.clicked()
-            for buttonSprite in buttonGroup:
-                if buttonSprite.rect.collidepoint((mx,my)):
-                    buttonSprite.clicked(buttonSprite)
+            if dialogShown == 'CHOICE':
+                for choiceSprite in choiceDialogGroup:
+                    if type(choiceSprite) == ActionToggle and choiceSprite.rect.collidepoint((mx,my)):
+                        choiceSprite.clicked()
+                if enterButton.rect.collidepoint((mx,my)):
+                    enterButton.clicked(enterButton)
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_SPACE and dialogShown == 'RESULT':
+                dialogShown = 'DEFAULT'
                 
 
 
     screen.fill((255,255,255))
     roomGroup.draw(screen)
     peopleGroup.draw(screen)
-    if(selectedPerson is not None):
-        choiceGroup.draw(screen)
-    buttonGroup.draw(screen)
+    if(dialogShown == 'CHOICE'):
+        choiceDialogGroup.draw(screen)
+    elif(dialogShown == 'RESULT'):
+        resultDialogGroup.draw(screen)
+    else:
+        defaultDialogGroup.draw(screen)
     uiGroup.draw(screen)
     pygame.display.flip()
