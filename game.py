@@ -42,7 +42,6 @@ game = fw.Game([
     fw.Room('BEDROOM'),
     fw.Room('LIVING ROOM'),
     fw.Room('BASEMENT'),
-    fw.Room('CLASSROOM'),
     fw.Room('HALLWAY'),
     fw.Room('SWIMMING POOL')
 ],[
@@ -86,7 +85,7 @@ while 1:
             mx, my = pygame.mouse.get_pos()
             for personSprite in peopleGroup:
                 if personSprite.rect.collidepoint((mx,my)):
-                    for match in fw.askPerson(personSprite.person.memory,raw_input('who: '),raw_input('what: '),raw_input('where: '),float(raw_input('when: '))):
+                    for match in fw.askPerson(personSprite.person.memory,personSprite.person.name,raw_input('who: '),raw_input('what: '),raw_input('where: '),raw_input('when: ')):
                         print(match)
 
     screen.fill((0,0,0))

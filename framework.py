@@ -118,7 +118,10 @@ class Game ():
         return person
 
 def askPerson(memoryInput, askingInput, whoInput, whatInput, whereInput, whenInput):
-    
+    if whenInput != '?':
+        whenInput = float(whenInput)
+
+
     if whatInput == 'IN':
         if whoInput == '?':
             return checkWhoInRoom(memoryInput,askingInput,whereInput,whenInput)
@@ -126,6 +129,7 @@ def askPerson(memoryInput, askingInput, whoInput, whatInput, whereInput, whenInp
             return checkWhenInRoom(memoryInput,askingInput,whoInput,whereInput)
         elif whereInput == '?':
             return checkWhereSeen(memoryInput,askingInput,whoInput,whenInput)
+        return []
     else:
         matchList = []
 
