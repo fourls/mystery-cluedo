@@ -166,13 +166,22 @@ class TestQuestionAsking(unittest.TestCase):
 #   askPerson(memory,asking,who,what,where,when)
 
     def test_askPerson_calls_checkWhereSeen(self):
-        self.assertTrue(askPerson(self.memory,'MUSTARD','MUSTARD','IN','?',1.0) == ['DINING ROOM'])
+        apResult = askPerson(self.memory,'MUSTARD','MUSTARD','IN','?',1.0)
+        expected = createReturnDict(['DINING ROOM'],'checkWhereSeen')
+        print(apResult)
+        self.assertTrue(apResult == expected)
     
     def test_askPerson_calls_checkWhoInRoom(self):
-        self.assertTrue(sorted(askPerson(self.memory,'MUSTARD','?','IN','OBSERVATORY',2.5)) == sorted(['MUSTARD','SCARLET']))
+        apResult = askPerson(self.memory,'MUSTARD','?','IN','OBSERVATORY',2.5)
+        expected = createReturnDict(['SCARLET','MUSTARD'],'checkWhoInRoom')
+        print(apResult)
+        self.assertTrue(apResult == expected)
 
     def test_askPerson_calls_checkWhenInRoom(self):
-        self.assertTrue(askPerson(self.memory,'MUSTARD','MUSTARD','IN','OBSERVATORY','?') ==  [{'START':2.5,'END':7.0}])
+        apResult = askPerson(self.memory,'MUSTARD','MUSTARD','IN','OBSERVATORY','?')
+        expected = createReturnDict([{'START':2.5,'END':7.0}],'checkWhenInRoom')
+        print(apResult)
+        self.assertTrue(apResult == expected)
     
     def test_askPerson_calls_getMatching_what(self):
         mem = self.memory
@@ -183,7 +192,7 @@ class TestQuestionAsking(unittest.TestCase):
         when = 7.0
 
         apResult = askPerson(self.memory,asking,who,what,where,when)
-        gmResult = getMatching(self.memory,who,what,where,when)
+        gmResult = createReturnDict(getMatching(self.memory,who,what,where,when),'matched')
         self.assertTrue(apResult == gmResult)
     
     def test_askPerson_calls_getMatching_who(self):
@@ -195,7 +204,7 @@ class TestQuestionAsking(unittest.TestCase):
         when = 5.5
 
         apResult = askPerson(self.memory,asking,who,what,where,when)
-        gmResult = getMatching(self.memory,who,what,where,when)
+        gmResult = createReturnDict(getMatching(self.memory,who,what,where,when),'matched')
         self.assertTrue(apResult == gmResult)
     
     def test_askPerson_calls_getMatching_when(self):
@@ -207,7 +216,7 @@ class TestQuestionAsking(unittest.TestCase):
         when = '?'
 
         apResult = askPerson(self.memory,asking,who,what,where,when)
-        gmResult = getMatching(self.memory,who,what,where,when)
+        gmResult = createReturnDict(getMatching(self.memory,who,what,where,when),'matched')
         self.assertTrue(apResult == gmResult)
 
     def test_askPerson_calls_getMatching_where(self):
@@ -219,13 +228,19 @@ class TestQuestionAsking(unittest.TestCase):
         when = 5.5
 
         apResult = askPerson(self.memory,asking,who,what,where,when)
-        gmResult = getMatching(self.memory,who,what,where,when)
+        gmResult = createReturnDict(getMatching(self.memory,who,what,where,when),'matched')
         self.assertTrue(apResult == gmResult)
         
     def test_askPerson_tells_if_person_in_room_at_time(self):
-        gmResult = sorted(askPerson(self.memory,'MUSTARD','SCARLET','?','OBSERVATORY',4.5))
-        expected = sorted([{'who':'SCARLET','what':'IN','where':'OBSERVATORY','when':4.5}])
+        gmResult = askPerson(self.memory,'MUSTARD','SCARLET','?','OBSERVATORY',4.5)
+        expected = createReturnDict([{'who':'SCARLET','what':'IN','where':'OBSERVATORY','when':4.5}],'matched')
         self.assertTrue(gmResult == expected)
+    
+#   createReturnDict(result,context)
+    def test_createReturnDict(self):
+        result = [{'who':'SCARLET','what':'IN','where':'OBSERVATORY','when':4.5}]
+        context = 'matched'
+        self.assertTrue(createReturnDict(result,context) == {'type':context,'result':result})
 
 if __name__ == '__main__':
     unittest.main()
