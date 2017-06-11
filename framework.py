@@ -188,3 +188,51 @@ def getMatching(mem,who,what,where,when):
             matchList.append(item)
 
     return matchList
+
+def handleResult(result,asker,who,what,where,when):
+    retString = 'something\'s gone weird lol'
+    res = result['result']
+    if result['type'] == 'matched':
+        retString = res['who'] + ' ' + res['what'] + ' the ' + res['where'] + ' at ' + res['when'] + '.'
+    elif result['type'] == 'checkWhoInRoom':
+        if len(res) == 0:
+            retString = asker + ' doesn\'t know.'
+        else:
+            retString = ''
+            for per in range(len(res)):
+                retString += res[per]
+                if per < len(res) - 2:
+                    retString += ', '
+                elif per < len(res) - 1:
+                    retString += ' and '
+            if len(res) == 1:
+                retString += ' was '
+            else: 
+                retString += ' were '
+            retString += 'in the ' + where + ' at ' + when + '.'
+    elif result['type'] == 'checkWhereSeen':
+        if len(res) == 0:
+            retString = asker + ' didn\'t see ' + who + '.'
+        else:
+            retString = 'According to ' + asker + ', ' + who + ' was in the '
+            for per in range(len(res)):
+                retString += res[per]
+                if per < len(res) - 2:
+                    retString += ', '
+                elif per < len(res) - 1:
+                    retString += ' and '
+            retString += ' at ' + when + '.'
+    elif result['type'] == 'checkWhenInRoom':
+        if len(res) == 0:
+            retString = asker + ' never saw ' + who + ' in the ' + where + '.'
+        else:
+            retString = who + ' was in the ' + where + ' from '
+            for period in range(len(res)):
+                retString += str(res[period]['START']) + '-' + str(res[period]['END'])
+                if period < len(res) - 2:
+                    retString += ', '
+                elif period < len(res) - 1:
+                    retString += ' and from '
+                elif period == len(res) - 1:
+                    retString += '.'
+    return retString
