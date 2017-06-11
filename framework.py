@@ -125,7 +125,7 @@ def askPerson(memoryInput, whoInput, whatInput, whereInput, whenInput):
         elif whenInput == '?':
             return checkWhenInRoom(memoryInput,whoInput,whereInput)
         elif whereInput == '?':
-            return checkWhereSeen(memoryInput,whoInput,whenInput)
+            return checkWhereSeen(memoryInput,askingInput,whoInput,whenInput)
     else:
         matchList = []
 
@@ -173,15 +173,16 @@ def checkWhenInRoom(memory,who,where):
     return placesSeen
 
 # NAME in _______ at TIME
-def checkWhereSeen(memory,who,when):
+def checkWhereSeen(memory,asking,who,when):
     placesSeen = []
 
     for i in range(len(memory)):
-        if memory[i]['when'] <= when and memory[i]['who'] == who:
-            if memory[i]['what'] == 'ENTER' or memory[i]['what'] == 'IN':
+        if memory[i]['when'] <= when:
+            if (memory[i]['what'] == 'ENTER' or memory[i]['what'] == 'IN') and memory[i]['who'] == who:
                 placesSeen.append(memory[i]['where'])
-            elif memory[i]['what'] == 'LEAVE' and memory[i]['when'] <= when:
-                placesSeen.remove(memory[i]['where'])
+            elif memory[i]['what'] == 'LEAVE' and memory[i]['when'] <= when and (memory[i]['who'] == who or memory[i]['who'] == asking):
+                if memory[i]['where'] in placesSeen:
+                    placesSeen.remove(memory[i]['where'])
     
 
     return placesSeen
