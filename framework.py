@@ -117,11 +117,11 @@ class Game ():
 
         return person
 
-def askPerson(memoryInput, whoInput, whatInput, whereInput, whenInput):
+def askPerson(memoryInput, askingInput, whoInput, whatInput, whereInput, whenInput):
     
     if whatInput == 'IN':
         if whoInput == '?':
-            return checkWhoInRoom(memoryInput,whereInput,whenInput)
+            return checkWhoInRoom(memoryInput,askingInput,whereInput,whenInput)
         elif whenInput == '?':
             return checkWhenInRoom(memoryInput,askingInput,whoInput,whereInput)
         elif whereInput == '?':
@@ -144,7 +144,7 @@ def whatPersonDoes():
         return 'NOTHING'
 
 # ____ in PLACE at TIME
-def checkWhoInRoom(memory,where,when):
+def checkWhoInRoom(memory,asking,where,when):
     peopleInRoom = []
 
     for i in range(len(memory)):
@@ -155,6 +155,8 @@ def checkWhoInRoom(memory,where,when):
             elif memory[i]['what'] == 'LEAVE':
                 if memory[i]['when'] <= when:
                     peopleInRoom.remove(memory[i]['who'])
+                    if memory[i]['who'] == asking:
+                        peopleInRoom = []
     
     return peopleInRoom
 
