@@ -54,6 +54,12 @@ class UIText(pygame.sprite.Sprite):
     def updateText(self,text):
         self.text = text
         self.buildText()
+    
+    def hideText(self):
+        self.image.set_alpha(0)
+    
+    def showText(self):
+        self.image.set_alpha(255)
 
 class Button(pygame.sprite.Sprite):
     def __init__(self,x,y,width,height,text,clicked):
@@ -134,6 +140,7 @@ class ActionToggle(pygame.sprite.Sprite):
 peopleGroup = pygame.sprite.Group()
 roomGroup = pygame.sprite.Group()
 choiceGroup = pygame.sprite.Group()
+buttonGroup = pygame.sprite.Group()
 uiGroup = pygame.sprite.Group()
 
 personInputList = []
@@ -195,6 +202,8 @@ choiceGroup.add(timeChoiceButton)
 
 talkingToText = UIText(0,200,WIDTH,40,'')
 uiGroup.add(talkingToText)
+tipText = UIText(0,200,WIDTH,200,'Click on somebody to interact with them.')
+uiGroup.add(tipText)
 
 selectedPerson = None
 
@@ -210,10 +219,12 @@ def onEnterButtonClicked(self):
         print(match)
     
     selectedPerson = None
-    talkingToText.updateText('')
+    talkingToText.updateText('You shouldn\'t see this.')
+    talkingToText.hideText()
+    tipText.showText()
 
 enterButton = Button(0,400,WIDTH,40,'Ask',onEnterButtonClicked)
-uiGroup.add(enterButton)
+buttonGroup.add(enterButton)
 
 while 1:
     choiceGroup.update()
@@ -227,13 +238,15 @@ while 1:
             for personSprite in peopleGroup:
                 if personSprite.rect.collidepoint((mx,my)):
                     talkingToText.updateText('You are talking to ' + personSprite.person.name)
+                    talkingToText.showText()
+                    tipText.hideText()
                     selectedPerson = personSprite.person
             for choiceSprite in choiceGroup:
                 if choiceSprite.rect.collidepoint((mx,my)):
                     choiceSprite.clicked()
-            for uiSprite in uiGroup:
-                if uiSprite.rect.collidepoint((mx,my)):
-                    uiSprite.clicked(uiSprite)
+            for buttonSprite in buttonGroup:
+                if buttonSprite.rect.collidepoint((mx,my)):
+                    buttonSprite.clicked(buttonSprite)
                 
 
 
@@ -242,5 +255,6 @@ while 1:
     peopleGroup.draw(screen)
     if(selectedPerson is not None):
         choiceGroup.draw(screen)
+    buttonGroup.draw(screen)
     uiGroup.draw(screen)
     pygame.display.flip()
