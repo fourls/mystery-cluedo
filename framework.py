@@ -136,6 +136,11 @@ def askPerson(memoryInput, askingInput, whoInput, whatInput, whereInput, whenInp
         matching = getMatching(memoryInput,whoInput,whatInput,whereInput,whenInput)
         matchList += matching
 
+        if len(matchList) == 0 and whatInput == '?':
+            if whoInput in checkWhoInRoom(memoryInput,askingInput,whereInput,whenInput):
+                matchList.append({'who':whoInput,'what':'IN','where':whereInput,'when':whenInput})
+            
+
         return matchList
 
 def whatPersonDoes():
