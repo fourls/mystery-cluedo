@@ -117,31 +117,22 @@ class Game ():
 
         return person
 
-    def askPerson(self, personInput, whoInput, whatInput, whereInput, whenInput):
-        person = None
-        for p in self.people:
-            if p.name == personInput:
-                person = p
-        
-        if person == None:
-            return ['This person does not exist.']
-        
-        if whatInput == 'IN':
-            if whoInput == '?':
-                return checkWhoInRoom(person.memory,whereInput,whenInput)
-            elif whenInput == '?':
-                return checkWhenInRoom(person.memory,whoInput,whereInput)
-            elif whereInput == '?':
-                return checkWhereSeen(person.memory,whoInput,whenInput)
-        else:
-            matchList = []
+def askPerson(memoryInput, whoInput, whatInput, whereInput, whenInput):
+    
+    if whatInput == 'IN':
+        if whoInput == '?':
+            return checkWhoInRoom(memoryInput,whereInput,whenInput)
+        elif whenInput == '?':
+            return checkWhenInRoom(memoryInput,whoInput,whereInput)
+        elif whereInput == '?':
+            return checkWhereSeen(memoryInput,whoInput,whenInput)
+    else:
+        matchList = []
 
-            for person in self.people:
-                if person.name == personInput:
-                    matching = getMatching(person,whoInput,whatInput,whenInput,whereInput)
-                    matchList += matching
+        matching = getMatching(memoryInput,whoInput,whatInput,whenInput,whereInput)
+        matchList += matching
 
-            return matchList
+        return matchList
 
 def whatPersonDoes():
     percent = random.random()
@@ -195,12 +186,10 @@ def checkWhereSeen(memory,who,when):
 
     return placesSeen
 
-def getMatching(per,who,what,when,where):
+def getMatching(mem,who,what,when,where):
     matchList = []
     
-
-    lis = per.memory
-    for item in lis:
+    for item in mem:
         Ywho = False
         Ywhat = False
         Ywhen = False
