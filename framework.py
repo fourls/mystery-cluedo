@@ -133,7 +133,7 @@ def askPerson(memoryInput, askingInput, whoInput, whatInput, whereInput, whenInp
     else:
         matchList = []
 
-        matching = getMatching(memoryInput,whoInput,whatInput,whenInput,whereInput)
+        matching = getMatching(memoryInput,whoInput,whatInput,whereInput,whenInput)
         matchList += matching
 
         return matchList
@@ -193,7 +193,7 @@ def checkWhereSeen(memory,asking,who,when):
 
     return placesSeen
 
-def getMatching(mem,who,what,when,where):
+def getMatching(mem,who,what,where,when):
     matchList = []
     
     for item in mem:
