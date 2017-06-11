@@ -87,46 +87,105 @@ class TestQuestionAsking(unittest.TestCase):
             {'who':'MUSTARD','what':'LEAVE','where':'DINING ROOM','when':2.5},
             {'who':'SCARLET','what':'IN','where':'OBSERVATORY','when':2.5},
             {'who':'MUSTARD','what':'ENTER','where':'OBSERVATORY','when':2.5},
-            {'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5},
             {'who':'MUSTARD','what':'LEAVE','where':'OBSERVATORY','when':7.0},
-            {'who':'MUSTARD','what':'ENTER','where':'DINING ROOM','when':7.0}
+            {'who':'MUSTARD','what':'ENTER','where':'DINING ROOM','when':7.0},
+            {'who':'MUSTARD','what':'LEAVE','where':'DINING ROOM','when':9.0},
+            {'who':'MUSTARD','what':'ENTER','where':'SWIMMING POOL','when':9.0},
+            {'who':'SCARLET','what':'IN','where':'SWIMMING POOL','when':9.0}
         ]
 
-    def test_if_person_in_unknown_at_time(self):
-        self.assertTrue(checkWhereSeen(self.memory,'MUSTARD',1.0) == ['DINING ROOM'])
-        self.assertTrue(checkWhereSeen(self.memory,'MUSTARD',2.0) == ['DINING ROOM'])
-        self.assertTrue(checkWhereSeen(self.memory,'MUSTARD',2.5) == ['OBSERVATORY'])
-        self.assertTrue(checkWhereSeen(self.memory,'SCARLET',3.0) == ['OBSERVATORY'])
-        self.assertTrue(len(checkWhereSeen(self.memory,'SCARLET',6.0)) == 0)
+#   checkWhereSeen(memory,asking,who,when)
 
-    def test_if_unknown_in_place_at_time(self):
-        self.assertTrue(checkWhoInRoom(self.memory,'DINING ROOM',1.0) == ['MUSTARD'])
-        self.assertTrue(checkWhoInRoom(self.memory,'DINING ROOM',2.5) == [])
-        self.assertTrue(checkWhoInRoom(self.memory,'OBSERVATORY',2.5).sort() == ['MUSTARD','SCARLET'].sort())
-        self.assertTrue(checkWhoInRoom(self.memory,'OBSERVATORY',5.5) == ['MUSTARD'])
-        self.assertTrue(checkWhoInRoom(self.memory,'OBSERVATORY',6.0) == ['MUSTARD'])
+    def test_checkWhereSeen_when_you_enter_room(self):
+        self.assertTrue(checkWhereSeen(self.memory,'MUSTARD','MUSTARD',1.0) == ['DINING ROOM'])
     
-    def test_if_person_in_place_at_unknown(self):
-        self.assertTrue(checkWhenInRoom(self.memory,'MUSTARD','DINING ROOM') == [{'START':1.0,'END':2.5},{'START':7.0,'END':10.0}])
-        self.assertTrue(checkWhenInRoom(self.memory,'MUSTARD','LIVING ROOM') == [])
-        self.assertTrue(checkWhenInRoom(self.memory,'MUSTARD','OBSERVATORY') == [{'START':2.5,'END':7.0}])
-        self.assertTrue(checkWhenInRoom(self.memory,'SCARLET','OBSERVATORY') == [{'START':2.5,'END':5.5}])
+    def test_checkWhereSeen_when_you_are_in_room(self):
+        self.assertTrue(checkWhereSeen(self.memory,'MUSTARD','MUSTARD',2.0) == ['DINING ROOM'])
     
-    def test_get_matching(self):
+    def test_checkWhereSeen_when_you_leave_and_enter_a_new_room(self):
+        self.assertTrue(checkWhereSeen(self.memory,'MUSTARD','MUSTARD',2.5) == ['OBSERVATORY'])
+    
+    def test_checkWhereSeen_when_somebody_else_is_in_on_enter(self):
+        self.assertTrue(checkWhereSeen(self.memory,'MUSTARD','SCARLET',2.5) == ['OBSERVATORY'])
+
+    def test_checkWhereSeen_when_you_leave_but_they_stay(self):
+        self.assertTrue(len(checkWhereSeen(self.memory,'MUSTARD','SCARLET',7.0)) == 0)
+
+    def test_checkWhereSeen_when_you_are_in_room_at_end_of_game(self):
+        self.assertTrue(checkWhereSeen(self.memory,'MUSTARD','SCARLET',10.0) == ['SWIMMING POOL'])
+
+#   checkWhoInRoom(memory,where,when)
+
+    def test_checkWhoInRoom_when_you_enter_room(self):
+        self.assertTrue(checkWhoInRoom(self.memory,'MUSTARD','DINING ROOM',1.0) == ['MUSTARD'])
+    
+    def test_checkWhoInRoom_when_you_leave_room(self):
+        self.assertTrue(checkWhoInRoom(self.memory,'MUSTARD','DINING ROOM',2.5) == [])
+    
+    def test_checkWhoInRoom_when_you_enter_a_room_they_are_in(self):
+        self.assertTrue(checkWhoInRoom(self.memory,'MUSTARD','OBSERVATORY',2.5).sort() == ['MUSTARD','SCARLET'].sort())
+    
+    def test_checkWhoInRoom_after_you_have_left(self):
+        self.assertTrue(checkWhoInRoom(self.memory,'MUSTARD','OBSERVATORY',7.5) == [])
+    
+    def test_checkWhoInRoom_when_multiple_people_are_in_room(self):
+        self.assertTrue(checkWhoInRoom(self.memory,'MUSTARD','OBSERVATORY',6.0).sort() == ['MUSTARD','SCARLET'].sort())
+    
+#   checkWhenInRoom(memory,asking,who,where)
+
+    def test_checkWhenInRoom_when_you_visit_multiple_times(self):
+        self.assertTrue(checkWhenInRoom(self.memory,'MUSTARD','MUSTARD','DINING ROOM') == [{'START':1.0,'END':2.5},{'START':7.0,'END':9.0}])
+    
+    def test_checkWhenInRoom_when_you_never_visit(self):
+        self.assertTrue(checkWhenInRoom(self.memory,'MUSTARD','MUSTARD','LIVING ROOM') == [])
+    
+    def test_checkWhenInRoom_when_you_enter(self):
+        self.assertTrue(checkWhenInRoom(self.memory,'MUSTARD','MUSTARD','OBSERVATORY') == [{'START':2.5,'END':7.0}])
+    
+    def test_checkWhenInRoom_when_you_leave_before_them(self):
+        self.assertTrue(checkWhenInRoom(self.memory,'MUSTARD','SCARLET','OBSERVATORY') == [{'START':2.5,'END':7.0}])
+
+#   getMatching(memory,who,what,where,when)
+
+    def test_getMatching_when(self):
         self.assertTrue(getMatching(self.memory,'MUSTARD','ENTER','DINING ROOM','?').sort() == [{'who':'MUSTARD','what':'ENTER','where':'DINING ROOM','when':1.0},{'who':'MUSTARD','what':'ENTER','where':'DINING ROOM','when':7.0}].sort())
+    
+    def test_getMatching_where(self):
         self.assertTrue(getMatching(self.memory,'SCARLET','LEAVE','?',5.5).sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
+    
+    def test_getMatching_who(self):
         self.assertTrue(getMatching(self.memory,'?','ENTER','OBSERVATORY',2.5).sort() == [{'who':'MUSTARD','what':'ENTER','where':'OBSERVATORY','when':2.5}].sort())
+        
+    def test_getMatching_what(self):
         self.assertTrue(getMatching(self.memory,'SCARLET','?','OBSERVATORY',5.5).sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
 
-    def test_ask_person_calls_check_x_in_room(self):
-        self.assertTrue(askPerson(self.memory,'MUSTARD','IN','?',1.0) == ['DINING ROOM'])
-        self.assertTrue(askPerson(self.memory,'?','IN','OBSERVATORY',2.5).sort() == ['MUSTARD','SCARLET'].sort())
-        self.assertTrue(askPerson(self.memory,'MUSTARD','IN','OBSERVATORY','?') ==  [{'START':2.5,'END':7.0}])
+    @unittest.skip('This is not implemented.')
+    def test_getMatching_what_if_you_are_in(self):
+        self.assertTrue(getMatching(self.memory,'SCARLET','?','OBSERVATORY',4.5).sort() == [{'who':'SCARLET','what':'IN','where':'OBSERVATORY','when':4.5}].sort())
+
+#   askPerson(memory,asking,who,what,where,when)
+
+    def test_askPerson_calls_checkWhereSeen(self):
+        self.assertTrue(askPerson(self.memory,'MUSTARD','MUSTARD','IN','?',1.0) == ['DINING ROOM'])
     
-    def test_ask_person_calls_get_matching(self):
-        self.assertTrue(askPerson(self.memory,'SCARLET','?','OBSERVATORY',5.5).sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
-        self.assertTrue(askPerson(self.memory,'?','LEAVE','OBSERVATORY',5.5).sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
-        self.assertTrue(askPerson(self.memory,'SCARLET','LEAVE','OBSERVATORY','?').sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
+    def test_askPerson_calls_checkWhoInRoom(self):
+        self.assertTrue(askPerson(self.memory,'MUSTARD','?','IN','OBSERVATORY',2.5).sort() == ['MUSTARD','SCARLET'].sort())
+
+    def test_askPerson_calls_checkWhenInRoom(self):
+        self.assertTrue(askPerson(self.memory,'MUSTARD','MUSTARD','IN','OBSERVATORY','?') ==  [{'START':2.5,'END':7.0}])
+    
+    def test_askPerson_calls_getMatching_what(self):
+        self.assertTrue(askPerson(self.memory,'MUSTARD','SCARLET','?','OBSERVATORY',5.5).sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
+    
+    def test_askPerson_calls_getMatching_who(self):
+        self.assertTrue(askPerson(self.memory,'MUSTARD','?','LEAVE','OBSERVATORY',5.5).sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
+    
+    def test_askPerson_calls_getMatching_when(self):
+        self.assertTrue(askPerson(self.memory,'MUSTARD','SCARLET','LEAVE','OBSERVATORY','?').sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
+     
+    def test_askPerson_calls_getMatching_where(self):
+        self.assertTrue(askPerson(self.memory,'MUSTARD','SCARLET','LEAVE','?',5.5).sort() == [{'who':'SCARLET','what':'LEAVE','where':'OBSERVATORY','when':5.5}].sort())
+    
 
 if __name__ == '__main__':
     unittest.main()
