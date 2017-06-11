@@ -186,8 +186,12 @@ def checkWhereSeen(memory,who,when):
     placesSeen = []
 
     for i in range(len(memory)):
-        if memory[i]['when'] == when and memory[i]['who'] == who:
-            placesSeen.append(memory[i]['where'])
+        if memory[i]['when'] <= when and memory[i]['who'] == who:
+            if memory[i]['what'] == 'ENTER' or memory[i]['what'] == 'IN':
+                placesSeen.append(memory[i]['where'])
+            elif memory[i]['what'] == 'LEAVE' and memory[i]['when'] <= when:
+                placesSeen.remove(memory[i]['where'])
+    
 
     return placesSeen
 
