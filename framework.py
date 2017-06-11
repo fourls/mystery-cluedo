@@ -123,7 +123,7 @@ def askPerson(memoryInput, whoInput, whatInput, whereInput, whenInput):
         if whoInput == '?':
             return checkWhoInRoom(memoryInput,whereInput,whenInput)
         elif whenInput == '?':
-            return checkWhenInRoom(memoryInput,whoInput,whereInput)
+            return checkWhenInRoom(memoryInput,askingInput,whoInput,whereInput)
         elif whereInput == '?':
             return checkWhereSeen(memoryInput,askingInput,whoInput,whenInput)
     else:
@@ -159,14 +159,14 @@ def checkWhoInRoom(memory,where,when):
     return peopleInRoom
 
 # NAME in PLACE at _____
-def checkWhenInRoom(memory,who,where):
+def checkWhenInRoom(memory,asking,who,where):
     placesSeen = []
 
     for i in range(len(memory)):
-        if memory[i]['where'] == where and memory[i]['who'] == who:
-            if memory[i]['what'] == 'ENTER' or memory[i]['what'] == 'IN':
+        if memory[i]['where'] == where:
+            if (memory[i]['what'] == 'ENTER' or memory[i]['what'] == 'IN') and memory[i]['who'] == who:
                 placesSeen.append({'START':memory[i]['when'],'END':10.0})
-            elif memory[i]['what'] == 'LEAVE':
+            elif memory[i]['what'] == 'LEAVE' and (memory[i]['who'] == who or memory[i]['who'] == asking):
                 placesSeen[len(placesSeen)-1]['END'] = memory[i]['when']
     
 
