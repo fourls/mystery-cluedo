@@ -32,14 +32,30 @@ class Room(pygame.sprite.Sprite):
         textRect = textSurf.get_rect(center=(self.rect.width/2, self.rect.height/2))
         self.image.blit(textSurf, textRect)
 
-fw.initialise()
-
 peopleGroup = pygame.sprite.Group()
 roomGroup = pygame.sprite.Group()
 
+game = fw.Game([
+    fw.Room('DINING ROOM'),
+    fw.Room('OBSERVATORY'),
+    fw.Room('KITCHEN'),
+    fw.Room('BEDROOM'),
+    fw.Room('LIVING ROOM'),
+    fw.Room('BASEMENT'),
+    fw.Room('CLASSROOM'),
+    fw.Room('HALLWAY'),
+    fw.Room('SWIMMING POOL')
+],[
+    fw.Person('MUSTARD'),
+    fw.Person('BLUE'),
+    fw.Person('SCARLET'),
+    fw.Person('NAVY'),
+    fw.Person('GREEN')
+])
+
 rx = 0
 ry = 0
-for room in fw.rooms:
+for room in game.rooms:
     roomSprite = Room(room,rx,ry)
     roomGroup.add(roomSprite)
 
@@ -49,7 +65,7 @@ for room in fw.rooms:
         rx = 0
 
 
-for person in fw.people:
+for person in game.people:
     px = 300
     py = 300
     for roomSprite in roomGroup:
@@ -70,8 +86,8 @@ while 1:
             mx, my = pygame.mouse.get_pos()
             for personSprite in peopleGroup:
                 if personSprite.rect.collidepoint((mx,my)):
-                    for match in fw.askPerson(personSprite.person.name,raw_input('who: '),raw_input('what: '),raw_input('where: '),raw_input('when: ')):
-                        print(personSprite.person.name + ' says they saw ' + match['who'] + ' ' + match['what'] + ' the ' + match['where'] + ' at ' + str(match['when']))
+                    for match in fw.askPerson(personSprite.person.memory,raw_input('who: '),raw_input('what: '),raw_input('where: '),raw_input('when: ')):
+                        print(match)
 
     screen.fill((0,0,0))
     roomGroup.draw(screen)
