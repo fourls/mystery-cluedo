@@ -32,7 +32,13 @@ class Room(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
 
+        swapToAltImage = False
         if self.rect.x % 200 != 0:
+            swapToAltImage = True
+        if self.rect.y % 200 != 0:
+            swapToAltImage = not swapToAltImage
+        
+        if swapToAltImage:
             self.image = pygame.image.load('img/room-alt.png')
 
         textSurf = ROOM_FONT.render(self.room.name, 1, (0,0,0))
