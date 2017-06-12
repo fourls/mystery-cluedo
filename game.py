@@ -228,6 +228,10 @@ dialogShown = 'DEFAULT'
 
 def onEnterButtonClicked(self):
     global selectedPerson, dialogShown
+
+    if ActionToggle.canShowQuestionMark == True:
+        return
+
     asking = selectedPerson
     who = personChoiceButton.options[personChoiceButton.index]
     what = actionChoiceButton.options[actionChoiceButton.index]
