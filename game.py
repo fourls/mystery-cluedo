@@ -15,9 +15,14 @@ class Person(pygame.sprite.Sprite):
     def __init__(self, person, x, y):
        pygame.sprite.Sprite.__init__(self)
        self.person = person
-       self.image = pygame.image.load('img/' + person.name + '.png')
+       self.image = pygame.image.load('img/person-background.png')
        self.rect = self.image.get_rect()
-       self.rect.x, self.rect.y = x, y
+       self.rect.x, self.rect.y = x - 1, y - 1
+
+       self.foreground = pygame.image.load('img/' + person.name + '.png')
+       self.foregroundRect = self.foreground.get_rect(center=(self.rect.width/2,self.rect.height/2))
+
+       self.image.blit(self.foreground,self.foregroundRect)
 
 class Room(pygame.sprite.Sprite):
     def __init__(self,room, x, y):
