@@ -11,18 +11,40 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Mystery Cluedo')
 
+IMG_PERSON_BORDER = pygame.image.load('img/person-background.png')
+IMG_PERSON_BORDER_HIGHLIGHTED = pygame.image.load('img/person-background-highlighted.png')
+
 class Person(pygame.sprite.Sprite):
     def __init__(self, person, x, y):
-       pygame.sprite.Sprite.__init__(self)
-       self.person = person
-       self.image = pygame.image.load('img/person-background.png')
-       self.rect = self.image.get_rect()
-       self.rect.x, self.rect.y = x - 1, y - 1
+        pygame.sprite.Sprite.__init__(self)
+        self.person = person
+        # pylint: disable=E1121,E1123
+        self.image = pygame.Surface((22,22),flags=pygame.SRCALPHA)
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = x - 1, y - 1
 
-       self.foreground = pygame.image.load('img/' + person.name + '.png')
-       self.foregroundRect = self.foreground.get_rect(center=(self.rect.width/2,self.rect.height/2))
+        self.foreground = pygame.image.load('img/' + person.name + '.png')
+        self.foregroundRect = self.foreground.get_rect(center=(self.rect.width/2,self.rect.height/2))
 
-       self.image.blit(self.foreground,self.foregroundRect)
+        self.background = IMG_PERSON_BORDER
+        self.backgroundRect = self.background.get_rect(center=(self.rect.width/2,self.rect.height/2))
+
+        self.updateImage()
+    
+    def update(self):
+        self.updateImage()
+    
+    def updateImage(self):
+        self.image.fill((255,255,255,0))
+        self.image.blit(self.background,self.backgroundRect)
+        self.image.blit(self.foreground,self.foregroundRect)
+
+    def highlight(self):
+        self.background = IMG_PERSON_BORDER_HIGHLIGHTED
+    
+    def removeHighlight(self):
+        self.background = IMG_PERSON_BORDER
+
 
 class Room(pygame.sprite.Sprite):
     def __init__(self,room, x, y):
@@ -243,7 +265,7 @@ def onEnterButtonClicked(self):
     if ActionToggle.canShowQuestionMark == True:
         return
 
-    asking = selectedPerson
+    asking = selectedPerson.person
     who = personChoiceButton.options[personChoiceButton.index]
     what = actionChoiceButton.options[actionChoiceButton.index]
     where = placeChoiceButton.options[placeChoiceButton.index]
@@ -252,7 +274,9 @@ def onEnterButtonClicked(self):
     result = fw.askPerson(asking.memory,asking.name,who,what,where,when)
 
     
+    selectedPerson.removeHighlight()
     selectedPerson = None
+    
     talkingToText.updateText('You shouldn\'t see this.')
     resultText.updateText(fw.handleResult(result,asking.name,who,what,where,when))
     dialogShown = 'RESULT'
@@ -263,6 +287,7 @@ choiceDialogGroup.add(enterButton)
 while 1:
     choiceDialogGroup.update()
     uiGroup.update()
+    peopleGroup.update()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
@@ -273,7 +298,10 @@ while 1:
                 if personSprite.rect.collidepoint((mx,my)):
                     talkingToText.updateText('You are talking to ' + personSprite.person.name)
                     dialogShown = 'CHOICE'
-                    selectedPerson = personSprite.person
+                    if selectedPerson is not None:
+                        selectedPerson.removeHighlight()
+                    personSprite.highlight()
+                    selectedPerson = personSprite
             if dialogShown == 'CHOICE':
                 for choiceSprite in choiceDialogGroup:
                     if type(choiceSprite) == ActionToggle and choiceSprite.rect.collidepoint((mx,my)):
