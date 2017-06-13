@@ -16,10 +16,13 @@ class Room ():
         self.history.append({'who':name,'what':action,'when':time,'where':self.name})
 
 class Person ():
+    murderer = None
+    target = None
     def __init__(self, name):
         self.name = name
         self.memory = []
         self.room = -1
+        self.alive = True
         self.timeEnteredRoom = 1.0
 
 class Game ():
@@ -28,17 +31,30 @@ class Game ():
         self.people = p
         for p in self.people:
             self.personEnter(p,1.0,random.randint(0,len(self.rooms)-1))
+        Person.murderer = random.choice(self.people)
+        Person.target = random.choice(self.people)
         self.initialise()
     
     def initialise(self,time=1.5):
         while time <= 10.0:
             for person in self.people:
+                if not person.alive:
+                    continue
                 action = whatPersonDoes()
                 if action == 'LEAVE':
                     newroom = random.randint(0,len(self.rooms) - 1)
+                    if person is Person.murderer and Person.target.alive:
+                        newroom = Person.target.room
+                    
                     if not self.personAt(person,newroom):
                         person = self.personLeave(person,time)
                         person = self.personEnter(person,time,newroom)
+                elif action == 'DO':
+                    if person is Person.murderer and self.personAt(Person.target,Person.murderer.room):
+                        Person.target.alive = False
+                        self.rooms[person.room].event(Person.murderer,'KILL',time)
+                        self.rooms[person.room].event(Person.target,'DIE',time)
+
 
             time += 0.5
         for person in self.people: 
