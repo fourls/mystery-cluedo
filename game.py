@@ -15,7 +15,7 @@ worldRect = worldScreen.get_rect()
 # pylint: disable=E1121,E1123
 uiScreen = pygame.Surface(SIZE,flags=pygame.SRCALPHA)
 uiRect = uiScreen.get_rect()
-pygame.display.set_caption('Mystery Cluedo')
+pygame.display.set_caption('Mystery')
 
 IMG_PERSON_BORDER = pygame.image.load('img/person-background.png')
 IMG_PERSON_BORDER_HIGHLIGHTED = pygame.image.load('img/person-background-highlighted.png')
@@ -226,7 +226,7 @@ for room in game.rooms:
     roomGroup.add(roomSprite)
 
     rx += 100
-    if rx >= 400:
+    if rx >= WIDTH:
         ry += 100
         rx = 0
     
@@ -247,20 +247,20 @@ for person in game.people:
 
     personInputList.append(person.name)
 
-personChoiceButton = ActionToggle(0,240,WIDTH,40,personInputList + ['?'])
+personChoiceButton = ActionToggle(0,HEIGHT-200,WIDTH,40,personInputList + ['?'])
 choiceDialogGroup.add(personChoiceButton)
-actionChoiceButton = ActionToggle(0,280,WIDTH,40,['ENTER','IN','LEAVE'] + ['?'])
+actionChoiceButton = ActionToggle(0,HEIGHT-160,WIDTH,40,['ENTER','IN','LEAVE'] + ['?'])
 choiceDialogGroup.add(actionChoiceButton)
-placeChoiceButton = ActionToggle(0,320,WIDTH,40,roomInputList + ['?'])
+placeChoiceButton = ActionToggle(0,HEIGHT-120,WIDTH,40,roomInputList + ['?'])
 choiceDialogGroup.add(placeChoiceButton)
-timeChoiceButton = ActionToggle(0,360,WIDTH,40,[str(x * 0.5) for x in range(2, 21)] + ['?'])
+timeChoiceButton = ActionToggle(0,HEIGHT-80,WIDTH,40,[str(x * 0.5) for x in range(2, 21)] + ['?'])
 choiceDialogGroup.add(timeChoiceButton)
 
-talkingToText = UIText(0,200,WIDTH,40,'')
+talkingToText = UIText(0,HEIGHT-240,WIDTH,40,'')
 choiceDialogGroup.add(talkingToText)
-tipText = UIText(0,200,WIDTH,240,'Click on somebody to interact with them.')
+tipText = UIText(0,HEIGHT-240,WIDTH,240,'Click on somebody to interact with them.')
 defaultDialogGroup.add(tipText)
-resultText = UIText(0,200,WIDTH,240,'You shouldn\'t see this.')
+resultText = UIText(0,HEIGHT-240,WIDTH,240,'You shouldn\'t see this.')
 resultDialogGroup.add(resultText)
 
 selectedPerson = None
@@ -288,7 +288,7 @@ def onEnterButtonClicked(self):
     resultText.updateText(fw.handleResult(result,asking.name,who,what,where,when))
     dialogShown = 'RESULT'
 
-enterButton = Button(0,400,WIDTH,40,'Ask',onEnterButtonClicked)
+enterButton = Button(0,HEIGHT-40,WIDTH,40,'Ask',onEnterButtonClicked)
 choiceDialogGroup.add(enterButton)
 
 while 1:
