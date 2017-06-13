@@ -327,6 +327,9 @@ while 1:
             elif dialogShown == 'RESULT':
                 if resultText.rect.collidepoint((mx,my)):
                     dialogShown = 'DEFAULT'
+                    if selectedPerson is not None:
+                        selectedPerson.removeHighlight()
+                    selectedPerson = None
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE and dialogShown == 'RESULT':
                 dialogShown = 'DEFAULT'
