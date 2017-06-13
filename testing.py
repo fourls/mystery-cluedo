@@ -34,31 +34,11 @@ while True:
 '''
 
 class TestGameInit(unittest.TestCase):
-    def test_person_init(self):
-        game = Game(
+    def setUp(self):
+        self.dining_room = Room('DINING ROOM')
+        self.game = Game(
             [
-                Room('DINING ROOM')
-            ], 
-            [
-                Person('MUSTARD'),
-                Person('BLUE'),
-                Person('SCARLET'),
-                Person('NAVY'),
-                Person('GREEN')
-            ]
-        )
-        people = ['MUSTARD','BLUE','SCARLET','NAVY','GREEN']
-
-        for person in game.people:
-            self.assertTrue(person.name in people)
-            self.assertTrue(type(person.memory) is list)
-            self.assertTrue(person.room == 0)
-            self.assertEqual(person.room,0)
-    def test_room_init(self):
-        dining_room = Room('DINING ROOM')
-        game = Game(
-            [
-                dining_room,
+                Room('DINING ROOM'),
                 Room('OBSERVATORY'),
                 Room('KITCHEN'),
                 Room('BEDROOM'),
@@ -69,17 +49,38 @@ class TestGameInit(unittest.TestCase):
                 Room('SWIMMING POOL')
             ], 
             [
-                Person('MUSTARD')
+                Person('MUSTARD'),
+                Person('BLUE'),
+                Person('SCARLET'),
+                Person('NAVY'),
+                Person('GREEN')
             ]
         )
 
-        self.assertEqual(game.rooms[0],dining_room)
+    def test_target_dies(self):
+        self.assertTrue(self.game.target.alive == False)
+    
+    def test_kill_event_registers(self):
+        killEv = None
+        for mem in self.game.rooms[self.game.placeOfDeath].history:
+            if mem['what'] == 'KILL' and mem['who'] == self.game.murderer.name:
+                killEv = mem
+        self.assertTrue(killEv is not None)
+    
+    def test_die_event_registers(self):
+        killEv = None
+        for mem in self.game.rooms[self.game.placeOfDeath].history:
+            if mem['what'] == 'DIE' and mem['who'] == self.game.target.name:
+                killEv = mem
+        self.assertTrue(killEv is not None)
+    
+    def test_murderer_enters_before_death(self):
+        self.assertTrue(self.game.timeMurdererEnters < self.game.timeOfDeath)
 
-        for room in game.rooms:
-            self.assertTrue(type(room.name) is str)
-            self.assertTrue(type(room.history) is list)
-            self.assertTrue(type(room.people) is list)
-            
+    def test_target_enters_before_death(self):
+        self.assertTrue(self.game.timeTargetEnters < self.game.timeOfDeath)
+
+
 class TestQuestionAsking(unittest.TestCase):
     def setUp(self):
         self.memory = [
@@ -168,19 +169,16 @@ class TestQuestionAsking(unittest.TestCase):
     def test_askPerson_calls_checkWhereSeen(self):
         apResult = askPerson(self.memory,'MUSTARD','MUSTARD','IN','?',1.0)
         expected = createReturnDict(['DINING ROOM'],'checkWhereSeen')
-        print(apResult)
         self.assertTrue(apResult == expected)
     
     def test_askPerson_calls_checkWhoInRoom(self):
         apResult = askPerson(self.memory,'MUSTARD','?','IN','OBSERVATORY',2.5)
         expected = createReturnDict(['SCARLET','MUSTARD'],'checkWhoInRoom')
-        print(apResult)
         self.assertTrue(apResult == expected)
 
     def test_askPerson_calls_checkWhenInRoom(self):
         apResult = askPerson(self.memory,'MUSTARD','MUSTARD','IN','OBSERVATORY','?')
         expected = createReturnDict([{'START':2.5,'END':7.0}],'checkWhenInRoom')
-        print(apResult)
         self.assertTrue(apResult == expected)
     
     def test_askPerson_calls_getMatching_what(self):
