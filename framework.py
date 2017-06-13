@@ -42,8 +42,8 @@ class Game ():
 
             if self.timeOfDeath == time:
                 self.target.alive = False
-                self.rooms[self.placeOfDeath].event(self.murderer,'KILL',time)
-                self.rooms[self.placeOfDeath].event(self.target,'DIE',time)
+                self.rooms[self.placeOfDeath].event(self.murderer.name,'KILL',time)
+                self.rooms[self.placeOfDeath].event(self.target.name,'DIE',time)
 
             for person in self.people:
                 if not person.alive:
@@ -226,8 +226,17 @@ def getMatching(mem,who,what,where,when):
 def handleResult(result,asker,who,what,where,when):
     retString = 'something\'s gone weird lol'
     res = result['result']
+    if result['type'] == 'matchedIn':
+        return asker + 'doesn\'t know.'
     if result['type'] == 'matched':
-        retString = res['who'] + ' ' + res['what'] + ' the ' + res['where'] + ' at ' + res['when'] + '.'
+        retString = asker + ' saw '
+        for per in range(len(res)):
+            retString += res['who'] + ' ' + res['what'] + ' the ' + res['where'] + ' at ' + str(res['when'])
+            if per < len(res) - 2:
+                retString += ', '
+            elif per < len(res) - 1:
+                retString += ' and '
+        retString += '.'
     elif result['type'] == 'checkWhoInRoom':
         if len(res) == 0:
             retString = asker + ' doesn\'t know.'
