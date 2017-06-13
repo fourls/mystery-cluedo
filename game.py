@@ -9,9 +9,10 @@ ROOM_FONT = pygame.font.SysFont('Tahoma', 11)
 UI_FONT = pygame.font.SysFont('Tahoma',15)
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SIZE)
-# pylint: disable=E1121
+# pylint: disable=E1121,E1123
 worldScreen = pygame.Surface(SIZE,flags=pygame.SRCALPHA)
 worldRect = worldScreen.get_rect()
+# pylint: disable=E1121,E1123
 uiScreen = pygame.Surface(SIZE,flags=pygame.SRCALPHA)
 uiRect = uiScreen.get_rect()
 pygame.display.set_caption('Mystery Cluedo')
@@ -52,10 +53,11 @@ class Person(pygame.sprite.Sprite):
 
 
 class Room(pygame.sprite.Sprite):
-    def __init__(self,room, x, y):
+    def __init__(self,room, x, y, width=100, height=100):
         pygame.sprite.Sprite.__init__(self)
         self.room = room
-        self.image = pygame.image.load('img/room.png')
+        self.image = pygame.Surface((width,height))
+        self.image.fill((180,180,180))
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
 
@@ -66,7 +68,7 @@ class Room(pygame.sprite.Sprite):
             swapToAltImage = not swapToAltImage
         
         if swapToAltImage:
-            self.image = pygame.image.load('img/room-alt.png')
+            self.image.fill((150,150,150))
 
         textSurf = ROOM_FONT.render(self.room.name, 1, (0,0,0))
         textRect = textSurf.get_rect(center=(self.rect.width/2, self.rect.height/2))
@@ -325,7 +327,7 @@ while 1:
     screen.fill((255,255,255))
     worldScreen.fill((255,255,255,0))
     uiScreen.fill((255,255,255,0))
-    
+
     roomGroup.draw(worldScreen)
     peopleGroup.draw(worldScreen)
     if(dialogShown == 'CHOICE'):
