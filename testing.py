@@ -79,7 +79,7 @@ class TestGameInit(unittest.TestCase):
             self.assertTrue(type(room.name) is str)
             self.assertTrue(type(room.history) is list)
             self.assertTrue(type(room.people) is list)
-
+            
 class TestQuestionAsking(unittest.TestCase):
     def setUp(self):
         self.memory = [
