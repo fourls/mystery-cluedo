@@ -31,27 +31,47 @@ class Game ():
             self.personEnter(p,1.0,random.randint(0,len(self.rooms)-1))
         self.murderer = random.choice(self.people)
         self.target = random.choice(self.people)
+        self.timeOfDeath = random.choice([1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0])
+        self.timeMurdererEnters = self.timeOfDeath - (float(random.randrange(1,4))/2)
+        self.timeTargetEnters = self.timeOfDeath - (float(random.randrange(1,4))/2)
+        self.placeOfDeath = random.randint(0,len(self.rooms)-1)
         self.initialise()
     
     def initialise(self,time=1.5):
         while time <= 10.0:
+
+            if self.timeOfDeath == time:
+                self.target.alive = False
+                self.rooms[self.placeOfDeath].event(self.murderer,'KILL',time)
+                self.rooms[self.placeOfDeath].event(self.target,'DIE',time)
+
             for person in self.people:
                 if not person.alive:
                     continue
-                action = whatPersonDoes()
-                if action == 'LEAVE':
-                    newroom = random.randint(0,len(self.rooms) - 1)
-                    if person is self.murderer and self.target.alive:
-                        newroom = self.target.room
-                    
+
+                if person is self.murderer and self.timeMurdererEnters == time:
+                    newroom = self.placeOfDeath
+
                     if not self.personAt(person,newroom):
                         person = self.personLeave(person,time)
                         person = self.personEnter(person,time,newroom)
-                elif action == 'DO':
-                    if person is self.murderer and self.personAt(self.target,self.murderer.room):
-                        self.target.alive = False
-                        self.rooms[person.room].event(self.murderer,'KILL',time)
-                        self.rooms[person.room].event(self.target,'DIE',time)
+
+                elif person is self.target and self.timeTargetEnters == time:
+                    newroom = self.placeOfDeath
+
+                    if not self.personAt(person,newroom):
+                        person = self.personLeave(person,time)
+                        person = self.personEnter(person,time,newroom)
+                
+                
+                else:
+                    action = whatPersonDoes()
+                    if action == 'LEAVE':
+                        newroom = random.randint(0,len(self.rooms) - 1)
+                        
+                        if not self.personAt(person,newroom):
+                            person = self.personLeave(person,time)
+                            person = self.personEnter(person,time,newroom)
 
 
             time += 0.5
