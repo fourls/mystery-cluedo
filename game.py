@@ -29,7 +29,10 @@ class Person(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x - 1, y - 1
 
-        self.foreground = pygame.image.load('img/' + person.name + '.png')
+        if(self.person.alive):
+            self.foreground = pygame.image.load('img/' + person.name + '.png')
+        else:
+            self.foreground = pygame.Surface((1,1),flags=pygame.SRCALPHA)
         self.foregroundRect = self.foreground.get_rect(center=(self.rect.width/2,self.rect.height/2))
 
         self.background = IMG_PERSON_BORDER
@@ -303,12 +306,18 @@ while 1:
             mx, my = pygame.mouse.get_pos()
             for personSprite in peopleGroup:
                 if personSprite.rect.collidepoint((mx,my)):
-                    talkingToText.updateText('You are talking to ' + personSprite.person.name)
-                    dialogShown = 'CHOICE'
-                    if selectedPerson is not None:
-                        selectedPerson.removeHighlight()
-                    personSprite.highlight()
-                    selectedPerson = personSprite
+                    if personSprite.person.alive:
+                        talkingToText.updateText('You are talking to ' + personSprite.person.name)
+                        dialogShown = 'CHOICE'
+                        if selectedPerson is not None:
+                            selectedPerson.removeHighlight()
+                        personSprite.highlight()
+                        selectedPerson = personSprite
+                    else:
+                        resultText.updateText(personSprite.person.name + ' is dead.')
+                        personSprite.highlight()
+                        selectedPerson = personSprite
+                        dialogShown = 'RESULT'
             if dialogShown == 'CHOICE':
                 for choiceSprite in choiceDialogGroup:
                     if type(choiceSprite) == ActionToggle and choiceSprite.rect.collidepoint((mx,my)):
