@@ -294,6 +294,8 @@ def onEnterButtonClicked(self):
 enterButton = Button(0,HEIGHT-40,WIDTH,40,'Ask',onEnterButtonClicked)
 choiceDialogGroup.add(enterButton)
 
+print(game.murderer.name + ' killed ' + game.target.name)
+
 while 1:
     choiceDialogGroup.update()
     uiGroup.update()
