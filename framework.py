@@ -63,6 +63,8 @@ class Game ():
                         person = self.personLeave(person,time)
                         person = self.personEnter(person,time,newroom)
                 
+                elif person is self.murderer and self.timeOfDeath == time:
+                    continue
                 
                 else:
                     action = whatPersonDoes()
