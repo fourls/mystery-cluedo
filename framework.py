@@ -31,7 +31,7 @@ class Game ():
             self.personEnter(p,1.0,random.randint(0,len(self.rooms)-1))
         self.murderer = random.choice(self.people)
         self.target = random.choice(self.people)
-        self.timeOfDeath = random.choice([1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0])
+        self.timeOfDeath = random.choice([4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5])
         self.timeMurdererEnters = self.timeOfDeath - (float(random.randrange(1,4))/2)
         self.timeTargetEnters = self.timeOfDeath - (float(random.randrange(1,4))/2)
         self.placeOfDeath = random.randint(0,len(self.rooms)-1)
@@ -229,14 +229,17 @@ def handleResult(result,asker,who,what,where,when):
     if result['type'] == 'matchedIn':
         return asker + 'doesn\'t know.'
     if result['type'] == 'matched':
-        retString = asker + ' saw '
-        for per in range(len(res)):
-            retString += res['who'] + ' ' + res['what'] + ' the ' + res['where'] + ' at ' + str(res['when'])
-            if per < len(res) - 2:
-                retString += ', '
-            elif per < len(res) - 1:
-                retString += ' and '
-        retString += '.'
+        if len(res) == 0:
+            retString = asker + ' doesn\'t know.'
+        else:
+            retString = asker + ' saw '
+            for per in range(len(res)):
+                retString += res[per]['who'] + ' ' + res[per]['what'] + ' the ' + res[per]['where'] + ' at ' + str(res[per]['when'])
+                if per < len(res) - 2:
+                    retString += ', '
+                elif per < len(res) - 1:
+                    retString += ' and '
+            retString += '.'
     elif result['type'] == 'checkWhoInRoom':
         if len(res) == 0:
             retString = asker + ' doesn\'t know.'
