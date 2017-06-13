@@ -16,8 +16,6 @@ class Room ():
         self.history.append({'who':name,'what':action,'when':time,'where':self.name})
 
 class Person ():
-    murderer = None
-    target = None
     def __init__(self, name):
         self.name = name
         self.memory = []
@@ -31,8 +29,8 @@ class Game ():
         self.people = p
         for p in self.people:
             self.personEnter(p,1.0,random.randint(0,len(self.rooms)-1))
-        Person.murderer = random.choice(self.people)
-        Person.target = random.choice(self.people)
+        self.murderer = random.choice(self.people)
+        self.target = random.choice(self.people)
         self.initialise()
     
     def initialise(self,time=1.5):
@@ -43,17 +41,17 @@ class Game ():
                 action = whatPersonDoes()
                 if action == 'LEAVE':
                     newroom = random.randint(0,len(self.rooms) - 1)
-                    if person is Person.murderer and Person.target.alive:
-                        newroom = Person.target.room
+                    if person is self.murderer and self.target.alive:
+                        newroom = self.target.room
                     
                     if not self.personAt(person,newroom):
                         person = self.personLeave(person,time)
                         person = self.personEnter(person,time,newroom)
                 elif action == 'DO':
-                    if person is Person.murderer and self.personAt(Person.target,Person.murderer.room):
-                        Person.target.alive = False
-                        self.rooms[person.room].event(Person.murderer,'KILL',time)
-                        self.rooms[person.room].event(Person.target,'DIE',time)
+                    if person is self.murderer and self.personAt(self.target,self.murderer.room):
+                        self.target.alive = False
+                        self.rooms[person.room].event(self.murderer,'KILL',time)
+                        self.rooms[person.room].event(self.target,'DIE',time)
 
 
             time += 0.5
