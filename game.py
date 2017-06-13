@@ -9,6 +9,11 @@ ROOM_FONT = pygame.font.SysFont('Tahoma', 11)
 UI_FONT = pygame.font.SysFont('Tahoma',15)
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SIZE)
+# pylint: disable=E1121
+worldScreen = pygame.Surface(SIZE,flags=pygame.SRCALPHA)
+worldRect = worldScreen.get_rect()
+uiScreen = pygame.Surface(SIZE,flags=pygame.SRCALPHA)
+uiRect = uiScreen.get_rect()
 pygame.display.set_caption('Mystery Cluedo')
 
 IMG_PERSON_BORDER = pygame.image.load('img/person-background.png')
@@ -197,13 +202,13 @@ roomInputList = []
 
 game = fw.Game([
     fw.Room('DINING ROOM'),
-    fw.Room('OBSERVATORY'),
+    fw.Room('LIBRARY'),
     fw.Room('KITCHEN'),
     fw.Room('BEDROOM'),
-    fw.Room('LIVING ROOM'),
-    fw.Room('BASEMENT'),
-    fw.Room('HALLWAY'),
-    fw.Room('SWIMMING POOL')
+    fw.Room('LOUNGE'),
+    fw.Room('STUDY'),
+    fw.Room('HALL'),
+    fw.Room('BALLROOM')
 ],[
     fw.Person('MUSTARD'),
     fw.Person('BLUE'),
@@ -318,13 +323,18 @@ while 1:
 
 
     screen.fill((255,255,255))
-    roomGroup.draw(screen)
-    peopleGroup.draw(screen)
+    worldScreen.fill((255,255,255,0))
+    uiScreen.fill((255,255,255,0))
+    
+    roomGroup.draw(worldScreen)
+    peopleGroup.draw(worldScreen)
     if(dialogShown == 'CHOICE'):
-        choiceDialogGroup.draw(screen)
+        choiceDialogGroup.draw(uiScreen)
     elif(dialogShown == 'RESULT'):
-        resultDialogGroup.draw(screen)
+        resultDialogGroup.draw(uiScreen)
     else:
-        defaultDialogGroup.draw(screen)
-    uiGroup.draw(screen)
+        defaultDialogGroup.draw(uiScreen)
+    uiGroup.draw(uiScreen)
+    screen.blit(worldScreen,worldRect)
+    screen.blit(uiScreen,uiRect)
     pygame.display.flip()
